@@ -1,0 +1,21 @@
+{
+    "texto": "¿Es un monstruo?",
+    "hijo_si": {
+        "texto": "¿Es Humano?",
+        "hijo_si": {
+            "texto": "Vecna"
+        },
+        "hijo_no": {
+            "texto": "demogorgon"
+        }
+    },
+    "hijo_no": {
+        "texto": "¿Es pelorroja?",
+        "hijo_si": {
+            "texto": "Max"
+        },
+        "hijo_no": {
+            "texto": "Once"
+        }
+    }
+}

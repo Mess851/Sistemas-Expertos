@@ -1,0 +1,9 @@
+{
+    "texto": "¿Es un monstruo?",
+    "hijo_si": {
+        "texto": "demogorgon"
+    },
+    "hijo_no": {
+        "texto": "Once"
+    }
+}
