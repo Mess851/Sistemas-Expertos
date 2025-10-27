@@ -3,6 +3,19 @@ from tkinter import messagebox, simpledialog
 from PIL import Image, ImageTk  # <-- Importamos Pillow
 import json
 import os
+import sys
+
+# --- FUNCIÓN AYUDANTE PARA RUTAS DE PYINSTALLER ---
+def resource_path(relative_path):
+    """ Obtiene la ruta absoluta al recurso, funciona para desarrollo y para PyInstaller """
+    try:
+        # PyInstaller crea una carpeta temporal y guarda la ruta en _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        # Si no está en un bundle de PyInstaller, usa la ruta normal
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 # --- 1. LÓGICA DEL ÁRBOL Y JSON (Tu código original) ---
 
@@ -33,19 +46,34 @@ def dict_a_nodo(diccionario):
 
 def cargar_conocimiento(archivo="conocimiento.json"):
     """
-    Carga el árbol de conocimiento desde un archivo JSON.
+    Carga el árbol de conocimiento.
+    Prioridad 1: Archivo guardado junto al .exe (si existe).
+    Prioridad 2: Archivo base dentro del .exe.
+    Prioridad 3: Crear uno nuevo.
     """
-    if os.path.exists(archivo):
+    ruta_guardado = archivo # Ruta normal (junto al .exe)
+    ruta_bundle = resource_path(archivo) # Ruta dentro del .exe
+
+    # 1. Intentar cargar el archivo guardado (aprendizaje del usuario)
+    if os.path.exists(ruta_guardado):
         try:
-            with open(archivo, "r", encoding='utf-8') as f:
-                print("[Sistema: Cargando conocimiento desde JSON...]")
-                diccionario_arbol = json.load(f)
-                return dict_a_nodo(diccionario_arbol)
+            with open(ruta_guardado, "r", encoding='utf-8') as f:
+                print("[Sistema: Cargando conocimiento guardado por el usuario...]")
+                return dict_a_nodo(json.load(f))
         except Exception as e:
-            print(f"[Error al cargar, iniciando de cero: {e}]")
-    
-    # Este es tu árbol inicial, pero recomiendo usar el JSON que te pasé
-    print("[Sistema: No se encontró JSON o falló la carga. Creando uno nuevo.]")
+            print(f"[Error al cargar archivo guardado, intentando con el base: {e}]")
+
+    # 2. Si no hay archivo guardado, intentar cargar el base (el que compilaste)
+    if os.path.exists(ruta_bundle):
+        try:
+            with open(ruta_bundle, "r", encoding='utf-8') as f:
+                print("[Sistema: Cargando conocimiento base del programa...]")
+                return dict_a_nodo(json.load(f))
+        except Exception as e:
+            print(f"[Error al cargar archivo base: {e}]")
+
+    # 3. Si todo falla, crear uno nuevo
+    print("[Sistema: No se encontró JSON. Creando uno nuevo.]")
     nodo_raiz = Nodo("¿Es un monstruo?")
     nodo_raiz.hijo_si = Nodo("Demogorgon")
     nodo_raiz.hijo_no = Nodo("Once")
@@ -106,33 +134,31 @@ class AkinatorGUI:
         self.actualizar_ui()
 
     def mostrar_imagen(self, nombre_personaje):
-        """Intenta cargar y mostrar una imagen desde la carpeta 'images'."""
-        self.canvas_imagen.delete("all") # Limpiar imagen anterior
+        """Intenta cargar y mostrar una imagen desde la carpeta 'images' (compatible con PyInstaller)."""
+        self.canvas_imagen.delete("all") 
         
-        # Intentar cargar .png y .jpg
-        for extension in ['.png', '.jpg', '.jpeg']:
+        extensiones = ['.png', '.jpg', '.jpeg']
+
+        for extension in extensiones:
             # --- ¡AQUÍ ESTÁ EL CAMBIO! ---
-            # Le decimos a Python que busque dentro de la carpeta "images"
-            ruta_imagen = f"images/{nombre_personaje}{extension}" 
+            # Usamos resource_path() para crear la ruta correcta
+            ruta_relativa = os.path.join("images", f"{nombre_personaje}{extension}")
+            ruta_imagen = resource_path(ruta_relativa)
             # -----------------------------
             
             if os.path.exists(ruta_imagen):
                 try:
-                    # Abrir con Pillow
                     img_pil = Image.open(ruta_imagen)
-                    # Redimensionar
                     img_pil = img_pil.resize((350, 350), Image.LANCZOS)
-                    # Convertir para Tkinter
-                    self.tk_image = ImageTk.PhotoImage(img_pil) # IMPORTANTE: guardar referencia
+                    self.tk_image = ImageTk.PhotoImage(img_pil) 
                     
                     self.canvas_imagen.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
-                    return # Salir si se encontró la imagen
+                    return
                 except Exception as e:
                     print(f"Error al cargar imagen {ruta_imagen}: {e}")
                     self.canvas_imagen.create_text(175, 175, text=f"Error al\ncargar imagen", font=("Helvetica", 12))
                     return
 
-        # Si no se encontró ningún archivo de imagen
         print(f"No se encontró imagen en 'images/' para: {nombre_personaje}")
         self.canvas_imagen.create_text(175, 175, text=f"Imagen no encontrada:\n{nombre_personaje}", 
                                         font=("Helvetica", 12), justify="center")

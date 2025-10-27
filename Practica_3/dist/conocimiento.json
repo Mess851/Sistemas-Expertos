@@ -1,0 +1,75 @@
+{
+    "texto": "¿Tu personaje tiene poderes psíquicos?",
+    "hijo_si": {
+        "texto": "¿Es el villano principal de la temporada 4?",
+        "hijo_si": {
+            "texto": "Vecna"
+        },
+        "hijo_no": {
+            "texto": "Once"
+        }
+    },
+    "hijo_no": {
+        "texto": "¿Es un monstruo del 'Upside Down'?",
+        "hijo_si": {
+            "texto": "Demogorgon"
+        },
+        "hijo_no": {
+            "texto": "¿Es un adulto?",
+            "hijo_si": {
+                "texto": "¿Es el jefe de policía de Hawkins?",
+                "hijo_si": {
+                    "texto": "Jim Hopper"
+                },
+                "hijo_no": {
+                    "texto": "¿Es la madre de Will y Jonathan?",
+                    "hijo_si": {
+                        "texto": "Joyce Byers"
+                    },
+                    "hijo_no": {
+                        "texto": "¿Se le conoce como el 'niñero' del grupo?",
+                        "hijo_si": {
+                            "texto": "Steve Harrington"
+                        },
+                        "hijo_no": {
+                            "texto": "¿Es el líder del 'Hellfire Club' y toca la guitarra?",
+                            "hijo_si": {
+                                "texto": "Eddie Munson"
+                            },
+                            "hijo_no": {
+                                "texto": "Nancy Wheeler"
+                            }
+                        }
+                    }
+                }
+            },
+            "hijo_no": {
+                "texto": "¿Es una chica pelirroja que se unió en la temporada 2?",
+                "hijo_si": {
+                    "texto": "Max Mayfield"
+                },
+                "hijo_no": {
+                    "texto": "¿Desapareció en la primera temporada?",
+                    "hijo_si": {
+                        "texto": "Will Byers"
+                    },
+                    "hijo_no": {
+                        "texto": "¿Es el que le faltan los dientes frontales?",
+                        "hijo_si": {
+                            "texto": "Dustin Henderson"
+                        },
+                        "hijo_no": {
+                            "texto": "¿Es el líder del grupo y novio de Once?",
+                            "hijo_si": {
+                                "texto": "Mike Wheeler"
+                            },
+                            "hijo_no": {
+                                "texto": "Lucas Sinclair"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
