@@ -11,95 +11,127 @@ class SistemaExpertoApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Sistema Experto PC Master - Design Edition")
-        self.geometry("1000x650")
-        self.resizable(False, False)
+        self.title("Sistema Experto PC Master - Final")
+        
+        # 1. TAMAÑO FIJO (Coincide con tu imagen redimensionada)
+        self.geometry("1100x750")
+        self.resizable(False, False) # Bloqueamos para que no se descuadre la imagen
 
-        # 1. CARGAR IMAGEN DE FONDO
+        # 2. CARGAR FONDO ESTÁTICO (Sin redimensionado dinámico = 0 Lag)
         try:
-            # Tu diseño limpio de Figma (sin textos ni botones, solo arte)
-            bg_image_data = Image.open("fondo_design.png")
-            self.bg_image = ctk.CTkImage(bg_image_data, size=(1000, 650))
+            # Ruta de la imagen de fondo
+            directorio_actual = os.path.dirname(os.path.abspath(__file__))
+            ruta_fondo = os.path.join(directorio_actual, "images", "fondo_design.png")
             
-            self.bg_label = ctk.CTkLabel(self, text="", image=self.bg_image)
-            self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-        except Exception:
-            self.configure(fg_color="#E0F7FA") # Fondo de respaldo
-            print("⚠️ No encontré 'fondo_design.png'.")
+            # Cargar imagen
+            pil_bg = Image.open(ruta_fondo)
+            # Definimos el tamaño exacto de la ventana
+            bg_image = ctk.CTkImage(light_image=pil_bg, dark_image=pil_bg, size=(1100, 750))
+            
+            # Ponerla en un Label al fondo
+            self.bg_label = ctk.CTkLabel(self, text="", image=bg_image)
+            self.bg_label.place(x=0, y=0) # Coordenadas fijas 0,0
 
-        # 2. INTERFAZ
+        except Exception as e:
+            self.configure(fg_color="#E0F7FA") # Color de respaldo
+            print(f"⚠️ Error cargando fondo: {e}")
+
+        # Crear los controles
         self.crear_controles()
 
     def crear_controles(self):
-        # Frame transparente para agrupar controles a la izquierda
+        # Frame transparente para agrupar controles
         self.frame_izquierdo = ctk.CTkFrame(self, fg_color="transparent")
-        self.frame_izquierdo.place(x=50, y=100) # <--- MUEVE ESTO si tus botones no calzan
+        self.frame_izquierdo.place(relx=0.08, rely=0.25) 
 
         # --- SECCIÓN PRESUPUESTO ---
         lbl_presu = ctk.CTkLabel(self.frame_izquierdo, text="Presupuesto", 
-                                 font=("Arial Rounded MT Bold", 24, "bold"), text_color="#5F7D8B")
-        lbl_presu.pack(anchor="w", pady=(0, 0))
+                                 font=("Arial Rounded MT Bold", 26, "bold"), text_color="#5F7D8B")
+        lbl_presu.pack(anchor="w")
 
-        # Etiqueta dinámica que cambia con el slider
         self.lbl_valor = ctk.CTkLabel(self.frame_izquierdo, text="$15,000", 
-                                      font=("Arial", 20, "bold"), text_color="#009688")
+                                      font=("Arial", 22, "bold"), text_color="#009688")
         self.lbl_valor.pack(anchor="w", pady=(0, 5))
 
-        # EL SLIDER (Restaurado)
         self.slider = ctk.CTkSlider(self.frame_izquierdo, from_=5000, to=50000, 
-                                    width=250, height=20,
-                                    number_of_steps=45,
-                                    button_color="#009688",      # Verde azulado (Teal)
-                                    button_hover_color="#00796B",
-                                    progress_color="#4DB6AC",    # Barra llena
-                                    fg_color="#CFD8DC",          # Barra vacía (Gris)
+                                    width=280, height=20, number_of_steps=45,
+                                    button_color="#009688", progress_color="#4DB6AC", fg_color="#CFD8DC",
                                     command=self.actualizar_precio)
         self.slider.set(15000)
         self.slider.pack(pady=(0, 30))
 
         # --- SECCIÓN USO ---
         lbl_uso = ctk.CTkLabel(self.frame_izquierdo, text="Uso", 
-                               font=("Arial Rounded MT Bold", 24, "bold"), text_color="#5F7D8B")
+                               font=("Arial Rounded MT Bold", 26, "bold"), text_color="#5F7D8B")
         lbl_uso.pack(anchor="w", pady=(0, 5))
 
         self.menu_uso = ctk.CTkOptionMenu(self.frame_izquierdo, 
                                           values=["Básico", "Profesional", "Gamer"],
-                                          width=250, height=40,
-                                          corner_radius=15,
-                                          fg_color="white", 
-                                          button_color="#ECEFF1", button_hover_color="#CFD8DC",
-                                          text_color="#455A64", 
-                                          dropdown_fg_color="white", dropdown_text_color="#455A64",
+                                          width=280, height=45, corner_radius=15,
+                                          fg_color="white", button_color="#ECEFF1", button_hover_color="#CFD8DC",
+                                          text_color="#455A64", dropdown_fg_color="white", dropdown_text_color="#455A64",
                                           font=("Arial", 16))
         self.menu_uso.pack(pady=(0, 50))
         self.menu_uso.set("Gamer")
 
-        # --- BOTÓN ANALIZAR ---
-        self.btn_analizar = ctk.CTkButton(self.frame_izquierdo, text="Analizar", 
-                                          width=200, height=50,
-                                          corner_radius=20,
-                                          font=("Arial Rounded MT Bold", 20),
-                                          fg_color="#CFD8DC", hover_color="#B0BEC5",
-                                          text_color="#546E7A", border_color="white", border_width=2,
-                                          command=self.buscar_recomendacion)
-        self.btn_analizar.pack()
+        # --- BOTÓN ANALIZAR (IMAGEN - SOLUCIÓN DEFINITIVA HOVER) ---
+        directorio_actual = os.path.dirname(os.path.abspath(__file__))
+        ruta_btn = os.path.join(directorio_actual, "images", "btn_analizar.png")
+        
+        try:
+            # 1. Cargar la imagen UNA SOLA VEZ y guardarla en la clase (self)
+            # Esto es vital para que no desaparezca
+            pil_btn = Image.open(ruta_btn)
+            self.img_btn_final = ctk.CTkImage(light_image=pil_btn, dark_image=pil_btn, size=(220, 60))
+
+            # 2. Crear el botón
+            self.btn_analizar = ctk.CTkButton(self.frame_izquierdo, 
+                                              text="", 
+                                              image=self.img_btn_final, # Usamos la imagen guardada
+                                              width=220, height=60,
+                                              fg_color="transparent", 
+                                              
+                                              # IMPORTANTE: Lo volvemos a poner en None, el truco viene abajo
+                                              hover_color=None,
+                                              
+                                              command=self.buscar_recomendacion)
+            self.btn_analizar.pack(pady=(10,0))
+
+            # --- EL TRUCO MÁGICO ---
+            # Definimos dos funciones pequeñas que fuerzan a que la imagen se mantenga
+            # cuando el mouse entra y sale, anulando el cuadro azul.
+            def on_enter(e):
+                self.btn_analizar.configure(image=self.img_btn_final)
+            
+            def on_leave(e):
+                self.btn_analizar.configure(image=self.img_btn_final)
+
+            # "Anclamos" estas funciones a los eventos del mouse
+            self.btn_analizar.bind("<Enter>", on_enter)
+            self.btn_analizar.bind("<Leave>", on_leave)
+            # -----------------------
+
+        except Exception as e:
+            print(f"Error cargando botón imagen: {e}")
+            self.btn_analizar = ctk.CTkButton(self.frame_izquierdo, text="Analizar", font=("Arial", 20, "bold"), width=220, height=55, command=self.buscar_recomendacion)
+            self.btn_analizar.pack(pady=(10,0))
 
     def actualizar_precio(self, val):
         self.lbl_valor.configure(text=f"${int(val):,.0f}")
 
     def buscar_recomendacion(self):
-        # Frame de resultados (aparece a la derecha)
-        self.frame_resultados = ctk.CTkScrollableFrame(self, width=500, height=500, 
+        # Frame de Resultados
+        self.frame_resultados = ctk.CTkScrollableFrame(self, width=500, height=550, 
                                                        fg_color="white", corner_radius=20, 
                                                        label_text="Mejores Opciones", label_text_color="#546E7A")
-        self.frame_resultados.place(x=420, y=50) 
+        
+        # Ajusta esta posición según donde quieras que aparezca la lista
+        self.frame_resultados.place(relx=0.55, rely=0.1, relwidth=0.40, relheight=0.8) 
 
-        # Limpiar
         for widget in self.frame_resultados.winfo_children(): widget.destroy()
 
-        # Lógica
         uso = self.menu_uso.get()
-        presu = self.slider.get() # <--- Tomamos valor del slider
+        presu = self.slider.get()
         
         try:
             conn = sqlite3.connect("sistema_experto.db")
@@ -116,8 +148,7 @@ class SistemaExpertoApp(ctk.CTk):
             conn.close()
 
             if not resultados:
-                ctk.CTkLabel(self.frame_resultados, text="❌ Sin resultados.\nSube el presupuesto.", 
-                             text_color="#546E7A", font=("Arial", 16)).pack(pady=50)
+                ctk.CTkLabel(self.frame_resultados, text="❌ Sin resultados.", text_color="gray").pack(pady=50)
                 return
 
             for pc in resultados:
@@ -132,23 +163,24 @@ class SistemaExpertoApp(ctk.CTk):
         card = ctk.CTkFrame(self.frame_resultados, fg_color="#F5F5F5", corner_radius=15, border_width=1, border_color="#E0E0E0")
         card.pack(pady=10, padx=10, fill="x")
 
-        # Imagen
+        # Imagen del producto
         try:
-            ruta = os.path.join("imagenes", img_file)
-            pil_img = Image.open(ruta)
-            ctk_img = ctk.CTkImage(pil_img, size=(110, 80))
+            directorio_actual = os.path.dirname(os.path.abspath(__file__))
+            ruta_producto = os.path.join(directorio_actual, "images", img_file)
+            
+            pil_img = Image.open(ruta_producto)
+            ctk_img = ctk.CTkImage(light_image=pil_img, dark_image=pil_img, size=(110, 80))
+            
             ctk.CTkLabel(card, text="", image=ctk_img).pack(side="left", padx=10, pady=10)
         except:
             ctk.CTkLabel(card, text="[IMG]", width=110, height=80, fg_color="#DDD", corner_radius=10).pack(side="left", padx=10)
 
-        # Datos
         info = ctk.CTkFrame(card, fg_color="transparent")
         info.pack(side="left", fill="both", expand=True, pady=5)
         
         ctk.CTkLabel(info, text=f"{marca} {modelo}", font=("Arial", 16, "bold"), text_color="#37474F", anchor="w").pack(fill="x")
         ctk.CTkLabel(info, text=f"{ram}GB RAM | {gpu}", text_color="#78909C", anchor="w", font=("Arial", 12)).pack(fill="x")
         
-        # Precio
         ctk.CTkLabel(card, text=f"${precio:,.0f}", font=("Arial", 18, "bold"), text_color="#009688").pack(side="right", padx=15)
 
 if __name__ == "__main__":
