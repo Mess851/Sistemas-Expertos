@@ -14,7 +14,7 @@ def poblar_base_datos():
     # Verifica que tus archivos en la carpeta 'images' tengan estos nombres exactos.
     # --- LISTA CORREGIDA PARA llenar_bd.py ---
     nuevas_pcs = [
-        # --- GAMA BAJA / ESTUDIANTES ---
+        # ---  BAJAGAMA / ESTUDIANTES ---
         ('Acer', 'Aspire 3', 'Laptop', 7500, 'AMD', 'Ryzen 3 3250U', 4000, 8, 256, 1, 0, 'Radeon Vega', 1500, 'acer_aspire.jpg'),
         ('HP', 'Pavilion 15', 'Laptop', 10500, 'Intel', 'Core i3-1215U', 11000, 8, 512, 1, 0, 'Intel UHD', 2000, 'hp_pavilion.jpg'),
         ('Lenovo', 'IdeaPad Slim', 'Laptop', 9200, 'Intel', 'Core i3-1115G4', 6000, 8, 256, 1, 0, 'Intel UHD', 1000, 'lenovo_ideapad.jpg'),
