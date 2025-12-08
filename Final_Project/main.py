@@ -14,7 +14,7 @@ class SistemaExpertoApp(ctk.CTk):
         self.title("Sistema Experto PC Master - Final")
         
         # 1. TAMAÑO FIJO (Coincide con tu imagen redimensionada)
-        self.geometry("1100x750")
+        self.geometry("1024x696")
         self.resizable(False, False) # Bloqueamos para que no se descuadre la imagen
 
         # 2. CARGAR FONDO ESTÁTICO (Sin redimensionado dinámico = 0 Lag)
@@ -26,7 +26,7 @@ class SistemaExpertoApp(ctk.CTk):
             # Cargar imagen
             pil_bg = Image.open(ruta_fondo)
             # Definimos el tamaño exacto de la ventana
-            bg_image = ctk.CTkImage(light_image=pil_bg, dark_image=pil_bg, size=(1100, 750))
+            bg_image = ctk.CTkImage(light_image=pil_bg, dark_image=pil_bg, size=(1024, 696))
             
             # Ponerla en un Label al fondo
             self.bg_label = ctk.CTkLabel(self, text="", image=bg_image)
@@ -40,81 +40,70 @@ class SistemaExpertoApp(ctk.CTk):
         self.crear_controles()
 
     def crear_controles(self):
-        # Frame transparente para agrupar controles
-        self.frame_izquierdo = ctk.CTkFrame(self, fg_color="transparent")
-        self.frame_izquierdo.place(relx=0.08, rely=0.25) 
+        # --- CONFIGURACIÓN DE POSICIONES (CALIBRACIÓN) ---
+        # Ajusta estos números para mover los bloques completos
+        
+        POS_X = 0.08           # Qué tan a la izquierda están todos los controles (0.08 = 8%)
+        
+        # Alturas (Vertical)
+        Y_PRECIO   = 0.20      # Altura del texto "$15,000"
+        Y_SLIDER   = 0.24      # Altura de la barrita slider
+        Y_LISTA    = 0.40      # Altura de la lista desplegable
+        Y_BOTON    = 0.80     # Altura del botón Analizar
 
-        # --- SECCIÓN PRESUPUESTO ---
-        lbl_presu = ctk.CTkLabel(self.frame_izquierdo, text="Presupuesto", 
-                                 font=("Arial Rounded MT Bold", 26, "bold"), text_color="#5F7D8B")
-        lbl_presu.pack(anchor="w")
+        # -----------------------------------------------------
 
-        self.lbl_valor = ctk.CTkLabel(self.frame_izquierdo, text="$15,000", 
-                                      font=("Arial", 22, "bold"), text_color="#009688")
-        self.lbl_valor.pack(anchor="w", pady=(0, 5))
+        # 1. VALOR DINÁMICO ($15,000)
+        self.lbl_valor = ctk.CTkLabel(self.bg_label, 
+                                      text="$15,000", 
+                                      font=("Arial", 22, "bold"), text_color="#009688",
+                                      fg_color="transparent")
+        self.lbl_valor.place(relx=POS_X, rely=Y_PRECIO)
 
-        self.slider = ctk.CTkSlider(self.frame_izquierdo, from_=5000, to=50000, 
+        # 2. SLIDER
+        self.slider = ctk.CTkSlider(self.bg_label, 
+                                    from_=5000, to=50000, 
                                     width=280, height=20, number_of_steps=45,
                                     button_color="#009688", progress_color="#4DB6AC", fg_color="#CFD8DC",
+                                    bg_color="transparent", 
                                     command=self.actualizar_precio)
         self.slider.set(15000)
-        self.slider.pack(pady=(0, 30))
+        self.slider.place(relx=POS_X, rely=Y_SLIDER)
 
-        # --- SECCIÓN USO ---
-        lbl_uso = ctk.CTkLabel(self.frame_izquierdo, text="Uso", 
-                               font=("Arial Rounded MT Bold", 26, "bold"), text_color="#5F7D8B")
-        lbl_uso.pack(anchor="w", pady=(0, 5))
-
-        self.menu_uso = ctk.CTkOptionMenu(self.frame_izquierdo, 
+        # 3. LISTA DESPLEGABLE
+        self.menu_uso = ctk.CTkOptionMenu(self.bg_label, 
                                           values=["Básico", "Profesional", "Gamer"],
                                           width=280, height=45, corner_radius=15,
-                                          fg_color="white", button_color="#ECEFF1", button_hover_color="#CFD8DC",
+                                          fg_color="white", 
+                                          bg_color="transparent",
+                                          button_color="#ECEFF1", button_hover_color="#CFD8DC",
                                           text_color="#455A64", dropdown_fg_color="white", dropdown_text_color="#455A64",
                                           font=("Arial", 16))
-        self.menu_uso.pack(pady=(0, 50))
         self.menu_uso.set("Gamer")
+        self.menu_uso.place(relx=POS_X, rely=Y_LISTA)
 
-        # --- BOTÓN ANALIZAR (IMAGEN - SOLUCIÓN DEFINITIVA HOVER) ---
+        # 4. BOTÓN ANALIZAR
         directorio_actual = os.path.dirname(os.path.abspath(__file__))
         ruta_btn = os.path.join(directorio_actual, "images", "btn_analizar.png")
         
         try:
-            # 1. Cargar la imagen UNA SOLA VEZ y guardarla en la clase (self)
-            # Esto es vital para que no desaparezca
             pil_btn = Image.open(ruta_btn)
             self.img_btn_final = ctk.CTkImage(light_image=pil_btn, dark_image=pil_btn, size=(220, 60))
 
-            # 2. Crear el botón
-            self.btn_analizar = ctk.CTkButton(self.frame_izquierdo, 
-                                              text="", 
-                                              image=self.img_btn_final, # Usamos la imagen guardada
-                                              width=220, height=60,
-                                              fg_color="transparent", 
-                                              
-                                              # IMPORTANTE: Lo volvemos a poner en None, el truco viene abajo
-                                              hover_color=None,
-                                              
-                                              command=self.buscar_recomendacion)
-            self.btn_analizar.pack(pady=(10,0))
-
-            # --- EL TRUCO MÁGICO ---
-            # Definimos dos funciones pequeñas que fuerzan a que la imagen se mantenga
-            # cuando el mouse entra y sale, anulando el cuadro azul.
-            def on_enter(e):
-                self.btn_analizar.configure(image=self.img_btn_final)
+            self.btn_analizar = ctk.CTkLabel(self.bg_label, 
+                                             text="", 
+                                             image=self.img_btn_final,
+                                             fg_color="transparent",
+                                             cursor="hand2")
             
-            def on_leave(e):
-                self.btn_analizar.configure(image=self.img_btn_final)
-
-            # "Anclamos" estas funciones a los eventos del mouse
-            self.btn_analizar.bind("<Enter>", on_enter)
-            self.btn_analizar.bind("<Leave>", on_leave)
-            # -----------------------
-
-        except Exception as e:
-            print(f"Error cargando botón imagen: {e}")
-            self.btn_analizar = ctk.CTkButton(self.frame_izquierdo, text="Analizar", font=("Arial", 20, "bold"), width=220, height=55, command=self.buscar_recomendacion)
-            self.btn_analizar.pack(pady=(10,0))
+            self.btn_analizar.place(relx=POS_X, rely=Y_BOTON)
+            self.btn_analizar.bind("<Button-1>", lambda event: self.buscar_recomendacion())
+            
+        except Exception:
+            self.btn_analizar = ctk.CTkButton(self.bg_label, text="Analizar", 
+                                              font=("Arial", 20, "bold"), height=50, width=220,
+                                              command=self.buscar_recomendacion)
+            self.btn_analizar.place(relx=POS_X, rely=Y_BOTON)
 
     def actualizar_precio(self, val):
         self.lbl_valor.configure(text=f"${int(val):,.0f}")
@@ -125,8 +114,10 @@ class SistemaExpertoApp(ctk.CTk):
                                                        fg_color="white", corner_radius=20, 
                                                        label_text="Mejores Opciones", label_text_color="#546E7A")
         
-        # Ajusta esta posición según donde quieras que aparezca la lista
-        self.frame_resultados.place(relx=0.55, rely=0.1, relwidth=0.40, relheight=0.8) 
+        # --- CORRECCIÓN DE ESPACIO ---
+        # Antes: relx=0.55, relwidth=0.40
+        # Ahora: relx=0.50 (más a la izquierda), relwidth=0.45 (más ancho)
+        self.frame_resultados.place(relx=0.50, rely=0.1, relwidth=0.45, relheight=0.8) 
 
         for widget in self.frame_resultados.winfo_children(): widget.destroy()
 
@@ -161,28 +152,30 @@ class SistemaExpertoApp(ctk.CTk):
         marca, modelo, precio, ram, gpu, img_file = pc[0], pc[1], pc[2], pc[3], pc[4], pc[5]
 
         card = ctk.CTkFrame(self.frame_resultados, fg_color="#F5F5F5", corner_radius=15, border_width=1, border_color="#E0E0E0")
-        card.pack(pady=10, padx=10, fill="x")
+        card.pack(pady=10, padx=5, fill="x") # padx=5 da más espacio lateral interno
 
-        # Imagen del producto
+        # Imagen del producto (Reducida ligeramente para dar espacio)
         try:
             directorio_actual = os.path.dirname(os.path.abspath(__file__))
             ruta_producto = os.path.join(directorio_actual, "images", img_file)
             
             pil_img = Image.open(ruta_producto)
-            ctk_img = ctk.CTkImage(light_image=pil_img, dark_image=pil_img, size=(110, 80))
+            # Antes size=(110, 80) -> Ahora (100, 70) para ganar espacio
+            ctk_img = ctk.CTkImage(light_image=pil_img, dark_image=pil_img, size=(100, 75))
             
-            ctk.CTkLabel(card, text="", image=ctk_img).pack(side="left", padx=10, pady=10)
+            ctk.CTkLabel(card, text="", image=ctk_img).pack(side="left", padx=(10, 5), pady=10)
         except:
-            ctk.CTkLabel(card, text="[IMG]", width=110, height=80, fg_color="#DDD", corner_radius=10).pack(side="left", padx=10)
+            ctk.CTkLabel(card, text="[IMG]", width=100, height=75, fg_color="#DDD", corner_radius=10).pack(side="left", padx=10)
 
         info = ctk.CTkFrame(card, fg_color="transparent")
         info.pack(side="left", fill="both", expand=True, pady=5)
         
-        ctk.CTkLabel(info, text=f"{marca} {modelo}", font=("Arial", 16, "bold"), text_color="#37474F", anchor="w").pack(fill="x")
+        # Usamos wraplength para que si el nombre es muy largo, baje de renglón
+        ctk.CTkLabel(info, text=f"{marca} {modelo}", font=("Arial", 16, "bold"), text_color="#37474F", anchor="w", wraplength=150).pack(fill="x")
         ctk.CTkLabel(info, text=f"{ram}GB RAM | {gpu}", text_color="#78909C", anchor="w", font=("Arial", 12)).pack(fill="x")
         
-        ctk.CTkLabel(card, text=f"${precio:,.0f}", font=("Arial", 18, "bold"), text_color="#009688").pack(side="right", padx=15)
-
+        # Precio
+        ctk.CTkLabel(card, text=f"${precio:,.0f}", font=("Arial", 18, "bold"), text_color="#009688").pack(side="right", padx=10)
 if __name__ == "__main__":
     app = SistemaExpertoApp()
     app.mainloop()
